@@ -1,13 +1,10 @@
 """
 Desktop pan-tilt platform for OAK-D.
 =====================================================
-Generates 6 printable parts, modeled in assembled position:
-  1. base_plate   - bolts to chassis, pan servo hangs below it
-  2. pan_bar      - mounts directly on pan servo spline, carries both arms
-  3. arm_L        - left arm, holds tilt servo by its flange
-  4. arm_R        - right arm, pivot bearing for camera tray
-  5. tilt_disc    - mounts directly on tilt servo spline
-  6. camera_tray  - holds OAK-D via its 1/4"-20 tripod socket, tilts on disc + pivot
+This design contains the follow components:
+  1. Base: provides the base and rotation support.
+  2. Neck: a PVC pipe for the neck.
+  3. Tilt mount: holds a servo motor for tilt.
 
 How to run:
   FreeCAD -> View -> Panels -> Python console, paste this whole file and
@@ -15,11 +12,7 @@ How to run:
   Each part appears as a separate object: select one and File -> Export -> STL.
 
 Design notes:
-  * Both servo joints mount SPLINE-DIRECT (no horn): remove the stock horn and
-    PRESS the part onto the 25T spline — the bore is 0.3 mm undersized so the
-    metal teeth bite in and cut their own splines (a clearance bore would
-    rock ~4 deg). Retain axially with the horn's center screw
-    (reuse it if long enough, else M3x12).
+  * .
   * Flange joints use heat-set inserts (M3, 4.0 mm hole) instead of nuts
     where a nut would collide with moving parts.
   * All parts print flat, no supports. 4-6 mm walls suit PETG, 4+ perimeters.

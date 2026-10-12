@@ -9,6 +9,7 @@ import FreeCAD as App
 from FreeCAD import Base
 import Part
 from BasicShapes import Shapes
+import freecad.gears.commands
 
 ''' Make a hole at Z direction.
 '''
@@ -24,6 +25,8 @@ def MakeTube(outerD, innerD, height, x, y, z0):
     inner = Part.makeCylinder(innerD / 2.0, height, Base.Vector(x, y, z0), Base.Vector(0, 0, 1))
     return outer.cut(inner)
 
+''' Base plate definition.
+'''
 class BasePlate:
     def __init__(self):
         self.height = 10
@@ -76,9 +79,53 @@ class BasePlate:
 
         doc.recompute()
 
-# Create a new document.
-# doc = FreeCAD.newDocument("DesktopPanTilt")
+class J1_Spindle:
+    def __init__(self):
+        pass
+
+    def Instantiate(self, doc):
+        gear = freecad.gears.commands.CreateTimingGear.create()
+        gear.num_teeth = 60
+        gear.height = 12
+        gear.type = "htd5"
+        doc.recompute()
+        gear.Visibility = False
+
+        pad1 = Part.makeCylinder(48, 2, Base.Vector(0, 0, -2), Base.Vector(0, 0, 1))
+        pad2 = Part.makeCylinder(48, 2, Base.Vector(0, 0, 12), Base.Vector(0, 0, 1))
+        gearShape = gear.Shape.fuse(pad1)
+        gearShape = gearShape.fuse(pad2)
+
+        # gearObj = doc.addObject("Part::Feature", "Gear")
+        # gearObj.Shape = gearShape
+
+        param1 = [27, 8, 14]
+        cylinder1 = Part.makeCylinder(param1[0], param1[1], Base.Vector(0, 0, param1[2]),
+                Base.Vector(0, 0, 1))
+        param2 = [22.7, 40, param1[2] + param1[1]]
+        cylinder2 = Part.makeCylinder(param2[0], param2[1], Base.Vector(0, 0, param2[2]),
+                Base.Vector(0, 0, 1))
+        print(param2[1] + param2[2])
+
+        spindleShape = gearShape.fuse(cylinder1)
+        spindleShape = spindleShape.fuse(cylinder2)
+
+        # Cut mounting holes
+        z = param2[1] + param2[2] - 10
+        spindleShape = MakeHoleZ(spindleShape, 0, 15, 5, z, z + 10)
+        spindleShape = MakeHoleZ(spindleShape, 0, -15, 5, z, z + 10)
+        spindleShape = MakeHoleZ(spindleShape, 15, 0, 5, z, z + 10)
+        spindleShape = MakeHoleZ(spindleShape, -15, 0, 5, z, z + 10)
+
+        spindleObj = doc.addObject("Part::Feature", "J1_Spindle")
+        spindleObj.Shape = spindleShape
+        doc.recompute()
+
+# User needs to create a new document.
 doc = App.activeDocument()
 
 # Instantiate the base.
 BasePlate().Instantiate(doc)
+
+# Instantiate J1 spindle
+J1_Spindle().Instantiate(doc)
