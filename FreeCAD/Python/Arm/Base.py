@@ -14,15 +14,15 @@ import freecad.gears.commands
 ''' Make a hole at Z direction.
 '''
 def MakeHoleZ(shape, x, y, d, z0, z1):
-    tool = Part.makeCylinder(d / 2.0, z1 - z0, Base.Vector(x, y, z0),
-                             Base.Vector(0, 0, 1))
+    tool = Part.makeCylinder(d / 2.0, z1 - z0, FreeCAD.Vector(x, y, z0),
+                             FreeCAD.Vector(0, 0, 1))
     return shape.cut(tool)
 
 ''' Make a tube.
 '''
 def MakeTube(outerD, innerD, height, x, y, z0):
-    outer = Part.makeCylinder(outerD / 2.0, height, Base.Vector(x, y, z0), Base.Vector(0, 0, 1))
-    inner = Part.makeCylinder(innerD / 2.0, height, Base.Vector(x, y, z0), Base.Vector(0, 0, 1))
+    outer = Part.makeCylinder(outerD / 2.0, height, FreeCAD.Vector(x, y, z0), FreeCAD.Vector(0, 0, 1))
+    inner = Part.makeCylinder(innerD / 2.0, height, FreeCAD.Vector(x, y, z0), FreeCAD.Vector(0, 0, 1))
     return outer.cut(inner)
 
 ''' Base plate definition.
@@ -35,14 +35,14 @@ class BasePlate:
         pass
 
     def CreateMotorMount(self):
-        mount = Part.makeBox(38, 60, self.height + 2, Base.Vector(-19, -135, -1))
+        mount = Part.makeBox(38, 60, self.height + 2, FreeCAD.Vector(-19, -135, -1))
         edges = [mount.Edges[0], mount.Edges[2], mount.Edges[4], mount.Edges[6]]
         mount = mount.makeFillet(18, edges)
         return mount
 
     def Instantiate(self, doc, name, tVec=None, rVec=None):
         # Base plate
-        basePlate = Part.makeBox(160, 200, self.height, Base.Vector(-80, -150, 0))
+        basePlate = Part.makeBox(160, 200, self.height, FreeCAD.Vector(-80, -150, 0))
 
         # Create fillet
         edges = [basePlate.Edges[0], basePlate.Edges[2], basePlate.Edges[4], basePlate.Edges[6]]
@@ -114,18 +114,18 @@ class J1_Spindle:
         gear.Visibility = False
 
         # Gear pads
-        pad1 = Part.makeCylinder(48, 2, Base.Vector(0, 0, -2), Base.Vector(0, 0, 1))
-        pad2 = Part.makeCylinder(48, 2, Base.Vector(0, 0, 12), Base.Vector(0, 0, 1))
+        pad1 = Part.makeCylinder(48, 2, FreeCAD.Vector(0, 0, -2), FreeCAD.Vector(0, 0, 1))
+        pad2 = Part.makeCylinder(48, 2, FreeCAD.Vector(0, 0, 12), FreeCAD.Vector(0, 0, 1))
         gearShape = gear.Shape.fuse(pad1)
         gearShape = gearShape.fuse(pad2)
 
         # Spindle body
         param1 = [27, 8, 14]
-        shape = gearShape.fuse(Part.makeCylinder(param1[0], param1[1], Base.Vector(0, 0, param1[2]),
-                Base.Vector(0, 0, 1)))
+        shape = gearShape.fuse(Part.makeCylinder(param1[0], param1[1], FreeCAD.Vector(0, 0, param1[2]),
+                FreeCAD.Vector(0, 0, 1)))
         param2 = [22.7, 38, param1[2] + param1[1]]
-        shape = shape.fuse(Part.makeCylinder(param2[0], param2[1], Base.Vector(0, 0, param2[2]),
-                Base.Vector(0, 0, 1)))
+        shape = shape.fuse(Part.makeCylinder(param2[0], param2[1], FreeCAD.Vector(0, 0, param2[2]),
+                FreeCAD.Vector(0, 0, 1)))
 
         # Cut mounting holes
         z = param2[1] + param2[2] - 10
@@ -161,13 +161,13 @@ class J1_Motor:
         gear.Visibility = False
 
         # Gear pads
-        pad1 = Part.makeCylinder(12, 2, Base.Vector(0, 0, -2), Base.Vector(0, 0, 1))
-        pad2 = Part.makeCylinder(12, 2, Base.Vector(0, 0, 15), Base.Vector(0, 0, 1))
+        pad1 = Part.makeCylinder(12, 2, FreeCAD.Vector(0, 0, -2), FreeCAD.Vector(0, 0, 1))
+        pad2 = Part.makeCylinder(12, 2, FreeCAD.Vector(0, 0, 15), FreeCAD.Vector(0, 0, 1))
         gearShape = gear.Shape.fuse(pad1)
         gearShape = gearShape.fuse(pad2)
 
         # Motor body
-        motorBody = Part.makeBox(43, 43, 48, Base.Vector(-21.5, -21.5, 33))
+        motorBody = Part.makeBox(43, 43, 48, FreeCAD.Vector(-21.5, -21.5, 33))
         edges = [motorBody.Edges[0], motorBody.Edges[2], motorBody.Edges[4], motorBody.Edges[6]]
         motorBody = motorBody.makeFillet(5, edges)
 
@@ -177,8 +177,8 @@ class J1_Motor:
                 motorBody = MakeHoleZ(motorBody, x, y, 4, 33, 38)
 
         # Motor pad and shaft
-        motorPad = Part.makeCylinder(11, 2, Base.Vector(0, 0, 31), Base.Vector(0, 0, 1))
-        motorShaft = Part.makeCylinder(2.5, 20, Base.Vector(0, 0, 11), Base.Vector(0, 0, 1))
+        motorPad = Part.makeCylinder(11, 2, FreeCAD.Vector(0, 0, 31), FreeCAD.Vector(0, 0, 1))
+        motorShaft = Part.makeCylinder(2.5, 20, FreeCAD.Vector(0, 0, 11), FreeCAD.Vector(0, 0, 1))
 
         # Fuse all the parts
         motorShape = gearShape.fuse(motorBody)
@@ -208,7 +208,7 @@ class J2_Platform:
 
     def Instantiate(self, doc, name, tVec=None, rVec=None):
         # Base
-        base = Part.makeBox(120, 100, 10, Base.Vector(-60, -50, 0))
+        base = Part.makeBox(120, 100, 10, FreeCAD.Vector(-60, -50, 0))
         edges = [base.Edges[0], base.Edges[2], base.Edges[4], base.Edges[6]]
         shape = base.makeFillet(20, edges)
 
@@ -235,23 +235,177 @@ class J2_Platform:
         obj.Shape = shape
         doc.recompute()
 
+''' J2 wall 1
+'''
+class J2_Wall1:
+    def __init__(self):
+        pass
+
+    def Instantiate(self, doc, name, tVec=None, rVec=None):
+        # Base
+        base = Part.makeBox(130, 80, 10, FreeCAD.Vector(0, 40, 0), FreeCAD.Vector(1, 0, 0))
+        edges = [base.Edges[4], base.Edges[6]]
+        shape = base.makeFillet(20, edges)
+
+        # Mounting edge
+        me = Part.makeBox(20, 80, 10, FreeCAD.Vector(-20, -40, 0))
+        edges = [me.Edges[0], me.Edges[2]]
+        me = me.makeFillet(10, edges)
+        shape = shape.fuse(me)
+
+        # Mounting holes
+        for y in (-30, 0, 30):
+            shape = MakeHoleZ(shape, -10, y, 5, -1, 11)
+
+        # Bearing hole
+        shape = shape.cut(Part.makeCylinder(23.5, 7, FreeCAD.Vector(3, 0, 40), FreeCAD.Vector(1, 0, 0)))
+        shape = shape.cut(Part.makeCylinder(21, 12, FreeCAD.Vector(-1, 0, 40), FreeCAD.Vector(1, 0, 0)))
+
+        # Motor hole
+        mh = Part.makeBox(50, 40, 10, FreeCAD.Vector(0, 20, 70), FreeCAD.Vector(1, 0, 0))
+        edges = [mh.Edges[0], mh.Edges[2], mh.Edges[4], mh.Edges[6]]
+        mh = mh.makeFillet(19, edges)
+        shape = shape.cut(mh)
+
+        # Placement
+        if tVec != None:
+            shape = shape.translated(tVec)
+
+        # Create the object
+        obj = doc.addObject("Part::Feature", name)
+        obj.Shape = shape
+        doc.recompute()
+
+''' J2 wall 2
+'''
+class J2_Wall2:
+    def __init__(self):
+        pass
+
+    def Instantiate(self, doc, name, tVec=None, rVec=None):
+        # Base
+        base = Part.makeBox(70, 80, 10, FreeCAD.Vector(0, 40, 0), FreeCAD.Vector(1, 0, 0))
+        edges = [base.Edges[4], base.Edges[6]]
+        shape = base.makeFillet(20, edges)
+
+        # Mounting edge
+        me = Part.makeBox(20, 80, 10, FreeCAD.Vector(10, -40, 0))
+        edges = [me.Edges[4], me.Edges[6]]
+        me = me.makeFillet(10, edges)
+        shape = shape.fuse(me)
+
+        # Mounting holes
+        for y in (-30, 0, 30):
+            shape = MakeHoleZ(shape, 20, y, 5, -1, 11)
+
+        # Bearing hole
+        shape = shape.cut(Part.makeCylinder(23.5, 7, FreeCAD.Vector(0, 0, 40), FreeCAD.Vector(1, 0, 0)))
+        shape = shape.cut(Part.makeCylinder(21, 12, FreeCAD.Vector(-1, 0, 40), FreeCAD.Vector(1, 0, 0)))
+
+        # Placement
+        if tVec != None:
+            shape = shape.translated(tVec)
+
+        # Create the object
+        obj = doc.addObject("Part::Feature", name)
+        obj.Shape = shape
+        doc.recompute()
+
+''' J2 arm
+'''
+class J2_Arm:
+    def __init__(self):
+        pass
+
+    def Instantiate(self, doc, name, tVec=None, rVec=None):
+        # Base
+        base = Part.makeBox(260, 80, 15, FreeCAD.Vector(3, 40, 0), FreeCAD.Vector(1, 0, 0))
+        edges = [base.Edges[0], base.Edges[2], base.Edges[4], base.Edges[6]]
+        shape = base.makeFillet(35, edges)
+
+        # Gear
+        gear = freecad.gears.commands.CreateTimingGear.create()
+        gear.num_teeth = 32
+        gear.height = 17
+        gear.type = "htd5"
+        doc.recompute()
+        gear.Visibility = False
+
+        # Gear pads
+        pad1 = Part.makeCylinder(26, 2, FreeCAD.Vector(0, 0, -2), FreeCAD.Vector(0, 0, 1))
+        pad2 = Part.makeCylinder(26, 2, FreeCAD.Vector(0, 0, 17), FreeCAD.Vector(0, 0, 1))
+        gearShape = gear.Shape.fuse(pad1)
+        gearShape = gearShape.fuse(pad2)
+
+        # Shafts
+        # shaft1 = Part.makeCylinder(19, 12, FreeCAD.Vector(0, 0, -14), FreeCAD.Vector(0, 0, 1))
+        # gearShape = gearShape.fuse(shaft1)
+        # shaft2 = Part.makeCylinder(17.7, 10, FreeCAD.Vector(0, 0, -24), FreeCAD.Vector(0, 0, 1))
+        # gearShape = gearShape.fuse(shaft2)
+
+        gearShape = gearShape.rotate(FreeCAD.Vector(0, 0, 0), FreeCAD.Vector(0, 1, 0), 90)
+        shape = shape.fuse(gearShape.translated(FreeCAD.Vector(-16, 0, 32)))
+
+        # Placement
+        if tVec != None:
+            shape = shape.translated(tVec)
+
+        # Create the object
+        obj = doc.addObject("Part::Feature", name)
+        obj.Shape = shape
+        doc.recompute()
+
+''' J2 arm shaft
+'''
+class J2_ArmShaft:
+    def __init__(self):
+        pass
+
+    def Instantiate(self, doc, name, tVec=None, rVec=None):
+        shape = Part.makeCylinder(19, 12, FreeCAD.Vector(0, 0, 0), FreeCAD.Vector(0, 0, 1))
+        shape = shape.fuse(Part.makeCylinder(17.7, 10, FreeCAD.Vector(0, 0, -10),
+                FreeCAD.Vector(0, 0, 1)))
+
+        # Placement
+        if rVec != None:
+            shape = shape.rotate(rVec[0], rVec[1], rVec[2])
+        if tVec != None:
+            shape = shape.translated(tVec)
+
+        # Create the object
+        obj = doc.addObject("Part::Feature", name)
+        obj.Shape = shape
+        doc.recompute()
+
 
 ### Design layout.
 
 # User needs to create a new document.
 doc = App.activeDocument()
 
-# Instantiate the base.
+# The arm base.
 BasePlate().Instantiate(doc, "BasePlate")
 
+# J1 bearings
 J1_Bearing().Instantiate(doc, "J1_Bearing1", FreeCAD.Vector(0, 0, 5))
 J1_Bearing().Instantiate(doc, "J1_Bearing2", FreeCAD.Vector(0, 0, 21))
 
-# Instantiate J1 spindle
+# J1 spindle
 J1_Spindle().Instantiate(doc, "J1_Spindle", FreeCAD.Vector(0, 0, -17))
 
-# Instantiate J1 motor.
+# J1 motor.
 J1_Motor().Instantiate(doc, "J1_Motor", FreeCAD.Vector(0, -105, -18))
 
-# Instantiate J2 platform.
+# J2 platform.
 J2_Platform().Instantiate(doc, "J2_Platform", FreeCAD.Vector(0, 0, 43))
+
+# J2 platform walls
+J2_Wall1().Instantiate(doc, "J2_Wall1", FreeCAD.Vector(-40, 0, 53))
+J2_Wall2().Instantiate(doc, "J2_Wall1", FreeCAD.Vector(30, 0, 53))
+
+# J2 arm
+J2_Arm().Instantiate(doc, "J2_Arm", FreeCAD.Vector(0, 0, 61))
+J2_ArmShaft().Instantiate(doc, "J2_ArmShaft1", FreeCAD.Vector(-30, 0, 93),
+        [FreeCAD.Vector(0, 0, 0), FreeCAD.Vector(0, 1, 0), 90])
+J2_ArmShaft().Instantiate(doc, "J2_ArmShaft2", FreeCAD.Vector(30, 0, 93),
+        [FreeCAD.Vector(0, 0, 0), FreeCAD.Vector(0, 1, 0), -90])
